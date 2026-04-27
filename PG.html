@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌅 AI Password Generator</title>
+    <link rel="stylesheet" href="Style-PG.css">
+</head>
+<body>
+    <div class="main-container">
+        <h1>🌅 Password Generator</h1>
+        <p class="subtitle">Create strong, secure passwords</p>
+
+        <div class="password-display">
+            <input type="text" id="passwordField" readonly placeholder="Click Generate Button">
+            <button class="copy-btn" onclick="copyPassword()" title="Copy">📋</button>
+        </div>
+
+        <div class="option-group">
+            <label>Password Length</label>
+            <div class="length-container">
+                <input type="range" id="lengthSlider" min="4" max="16" value="12" oninput="updateLengthDisplay()">
+                <span class="length-value" id="lengthValue">12</span>
+            </div>
+        </div>
+
+        
+        <div class="option-group">
+            <label>Character Types</label>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="uppercase" checked>
+                    <label for="uppercase">Uppercase (A-Z)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lowercase" checked>
+                    <label for="lowercase">Lowercase (a-z)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="numbers" checked>
+                    <label for="numbers">Numbers (0-9)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="symbols" checked>
+                    <label for="symbols">Symbols (!@#$...)</label>
+                </div>
+            </div>
+        </div>
+
+        
+        <button class="generate-btn" onclick="generatePassword()">⚡ GENERATE PASSWORD</button>
+
+        
+        <div class="strength-container">
+            <div class="strength-bar">
+                <div class="strength-fill" id="strengthFill"></div>
+            </div>
+            <div class="strength-text" id="strengthText">Strength: -</div>
+        </div>
+    </div>
+
+    <script>
+        
+        function updateLengthDisplay() {
+            document.getElementById('lengthValue').textContent = document.getElementById('lengthSlider').value;
+        }
+
+        
+        function generatePassword() {
+            const length = parseInt(document.getElementById('lengthSlider').value);
+            const useUppercase = document.getElementById('uppercase').checked;
+            const useLowercase = document.getElementById('lowercase').checked;
+            const useNumbers = document.getElementById('numbers').checked;
+            const useSymbols = document.getElementById('symbols').checked;
+
+            
+            if (!useUppercase && !useLowercase && !useNumbers && !useSymbols) {
+                document.getElementById('passwordField').value = '⚠️ Select at least one type!';
+                document.getElementById('strengthText').textContent = 'Strength: -';
+                return;
+            }
+
+          
+            let charPool = '';
+            if (useUppercase) charPool += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (useLowercase) charPool += 'abcdefghijklmnopqrstuvwxyz';
+            if (useNumbers) charPool += '0123456789';
+            if (useSymbols) charPool += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+           
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += charPool.charAt(Math.floor(Math.random() * charPool.length));
+            }
+
+            
+            document.getElementById('passwordField').value = password;
+            
+           
+            updateStrength(password);
+        }
+
+        
+        function updateStrength(password) {
+            let strength = 0;
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+
+            
+            if (password.length >= 12) strength += 30;
+            else if (password.length >= 8) strength += 20;
+            else strength += 10;
+
+           
+            if (/[a-z]/.test(password)) strength += 15;
+            if (/[A-Z]/.test(password)) strength += 15;
+            if (/[0-9]/.test(password)) strength += 15;
+            if (/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) strength += 25;
+
+            strengthFill.style.width = strength + '%';
+
+            
+            if (strength >= 70) {
+                strengthText.textContent = '💪 Strength: Strong';
+                strengthFill.style.background = 'linear-gradient(90deg, #00ff00, #00cc00)';
+            } else if (strength >= 45) {
+                strengthText.textContent = '👍 Strength: Medium';
+                strengthFill.style.background = 'linear-gradient(90deg, #ffff00, #ffcc00)';
+            } else {
+                strengthText.textContent = '⚠️ Strength: Weak';
+                strengthFill.style.background = 'linear-gradient(90deg, #ff6b35, #ff4500)';
+            }
+        }
+
+        
+        function copyPassword() {
+            const password = document.getElementById('passwordField').value;
+            if (password && !password.includes('⚠️')) {
+                navigator.clipboard.writeText(password).then(() => {
+                    alert('📋 Password copied!');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
